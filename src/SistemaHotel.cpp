@@ -25,3 +25,23 @@ int SistemaHotel::cadastrarQuarto(int numero, int capacidade, float valorDiaria)
     
     return SUCESSO;
 }
+
+int SistemaHotel::cadastrarCliente(int codigo, std::string nome, std::string endereco, std::string telefone) {
+    if (codigo <= 0) {
+        return ERRO_CODIGO;
+    }
+
+    auto it = std::find_if(clientes.begin(), clientes.end(), 
+        [codigo](const Cliente& c){
+            return c.obterCodigo() == codigo;
+        });
+
+    if (it != clientes.end()) {
+        return ERRO_CODIGO;
+    }
+
+    Cliente novoCliente(codigo, nome, endereco, telefone);
+    clientes.push_back(novoCliente);
+    
+    return SUCESSO;
+}
