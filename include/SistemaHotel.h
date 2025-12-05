@@ -2,6 +2,7 @@
 #define SISTEMAHOTEL_H
 
 #include <vector>
+#include <string>
 #include "Quarto.h"
 #include "Cliente.h"
 #include "Funcionario.h"
@@ -24,6 +25,9 @@ public:
     int cadastrarQuarto(int numero, int capacidade, float valorDiaria);
     int cadastrarCliente(int codigo, std::string nome, std::string endereco, std::string telefone);
     int cadastrarFuncionario(int codigo, std::string nome, std::string telefone, std::string cargo, float salario);
+    
+    std::vector<Cliente> pesquisarCliente(int codigo, const std::string& nome);
+    std::vector<Funcionario> pesquisarFuncionario(int codigo, const std::string& nome);
     
     std::vector<Quarto>& obterQuartos() { return quartos; }
     void limparQuartos() { quartos.clear(); }

@@ -19,6 +19,8 @@ public:
     
     int obterCodigo() const { return codigo; }
     std::string obterNome() const { return nome; }
+    std::string obterTelefone() const { return telefone; }
+    std::string obterCargo() const { return cargo; }
     float obterSalario() const { return salario; }
 };
 

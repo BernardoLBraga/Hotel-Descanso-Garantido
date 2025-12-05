@@ -18,6 +18,7 @@ public:
     
     int obterCodigo() const { return codigo; }
     std::string obterNome() const { return nome; }
+    std::string obterEndereco() const { return endereco; }
     std::string obterTelefone() const { return telefone; }
 };
 
