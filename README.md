@@ -65,11 +65,11 @@ Esta seção detalha as regras de negócio implementadas nas funções de cadast
 1. Garantia de Unicidade
 Todas as funções de cadastro verificam a duplicidade do identificador único (código ou número):
 
-Cliente (F1): Não permite cadastro com codigo já existente.
+Cliente: Não permite cadastro com codigo já existente.
 
-Funcionário (F2): Não permite cadastro com codigo já existente.
+Funcionário: Não permite cadastro com codigo já existente.
 
-Quarto (F3): Não permite cadastro com numero já existente.
+Quarto: Não permite cadastro com numero já existente.
 
 2. Validações de Valores
 As seguintes validações de valores de domínio foram implementadas (retornando códigos de erro específicos):
