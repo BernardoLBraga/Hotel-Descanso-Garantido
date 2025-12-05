@@ -138,7 +138,7 @@ int main() {
             std::cout << "Opcao invalida. Tente novamente." << std::endl;
             continue;
         }
-
+        
         switch (opcao) {
             case 1:
                 processarCadastroQuarto(sistema);
