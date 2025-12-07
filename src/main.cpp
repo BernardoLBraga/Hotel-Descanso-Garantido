@@ -14,6 +14,9 @@ void processarCadastroFuncionario(SistemaHotel& sistema);
 void processarPesquisaCliente(SistemaHotel& sistema);
 void processarPesquisaFuncionario(SistemaHotel& sistema);
 void processarCadastroEstadia(SistemaHotel& sistema);
+void processarBaixaEstadia(SistemaHotel& sistema);
+void processarEstadiasCliente(SistemaHotel& sistema);
+void processarPontosFidelidade(SistemaHotel& sistema);
 
 
 void exibirMenu() {
@@ -24,6 +27,9 @@ void exibirMenu() {
     std::cout << "4. Pesquisar Cliente" << std::endl;
     std::cout << "5. Pesquisar Funcionario" << std::endl;
     std::cout << "6. Cadastrar Estadia" << std::endl;
+    std::cout << "7. Dar Baixa em Estadia" << std::endl;
+    std::cout << "8. Estadias do Cliente" << std::endl;
+    std::cout << "9. Pontos de Fidelidade" << std::endl;
     std::cout << "0. Sair e Salvar" << std::endl;
     std::cout << "Escolha uma opcao: ";
 }
@@ -139,7 +145,8 @@ void processarPesquisaCliente(SistemaHotel& sistema) {
         std::cout << "--- Resultados da Pesquisa ---" << std::endl;
         for (const auto& c : resultados) {
             std::cout << "Cod: " << c.obterCodigo() << " | Nome: " << c.obterNome() 
-                      << " | Tel: " << c.obterTelefone() << " | End: " << c.obterEndereco() << std::endl;
+                      << " | Tel: " << c.obterTelefone() << " | End: " << c.obterEndereco() 
+                      << " | Pontos: " << c.obterPontosFidelidade() << std::endl;
         }
     }
 }
@@ -211,6 +218,85 @@ void processarCadastroEstadia(SistemaHotel& sistema) {
     }
 }
 
+void processarBaixaEstadia(SistemaHotel& sistema) {
+    int codEstadia;
+    float valorTotal = 0.0f;
+
+    std::cout << "Codigo da Estadia para dar baixa: ";
+    std::cin >> codEstadia;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    int resultado = sistema.darBaixaEstadia(codEstadia, valorTotal);
+
+    if (resultado == SUCESSO) {
+        std::cout << "Baixa realizada com sucesso!" << std::endl;
+        std::cout << "Valor total a ser pago: R$ " << valorTotal << std::endl;
+        std::cout << "Quarto liberado." << std::endl;
+    } else if (resultado == ERRO_ESTADIA_NAO_ENCONTRADA) {
+        std::cout << "ERRO: Estadia com codigo " << codEstadia << " nao encontrada." << std::endl;
+    } else if (resultado == ERRO_ESTADIA_JA_FINALIZADA) {
+        std::cout << "ERRO: O quarto desta estadia ja esta desocupado (baixa ja realizada)." << std::endl;
+    } else {
+        std::cout << "ERRO desconhecido ao tentar dar baixa." << std::endl;
+    }
+}
+
+void processarEstadiasCliente(SistemaHotel& sistema) {
+    int codigo;
+    std::string nome;
+
+    std::cout << "Pesquisar estadias por (1) Codigo do Cliente ou (2) Nome do Cliente? ";
+    int tipo_pesquisa;
+    std::cin >> tipo_pesquisa;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    
+    if (tipo_pesquisa == 1) {
+        std::cout << "Digite o Codigo do Cliente: ";
+        std::cin >> codigo;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        nome = "";
+    } else if (tipo_pesquisa == 2) {
+        codigo = 0;
+        std::cout << "Digite o Nome do Cliente: ";
+        std::getline(std::cin, nome);
+    } else {
+        std::cout << "Opcao invalida." << std::endl;
+        return;
+    }
+
+    std::vector<Estadia> resultados = sistema.buscarEstadiasCliente(codigo, nome);
+    
+    if (resultados.empty()) {
+        std::cout << "Nenhuma estadia encontrada para o cliente." << std::endl;
+    } else {
+        std::cout << "--- Estadias do Cliente ---" << std::endl;
+        for (const auto& e : resultados) {
+            std::cout << "Estadia #"<< e.obterCodigoEstadia() 
+                      << " | Quarto: " << e.obterNumeroQuarto() 
+                      << " | Entrada: " << e.obterDataEntrada() 
+                      << " | Saida: " << e.obterDataSaida() 
+                      << " | Diarias: " << e.obterQtdDiarias() << std::endl;
+        }
+    }
+}
+
+void processarPontosFidelidade(SistemaHotel& sistema) {
+    int codigo;
+    
+    std::cout << "Digite o Codigo do Cliente para ver os Pontos de Fidelidade: ";
+    std::cin >> codigo;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    Cliente* cliente = sistema.buscarClientePorCodigo(codigo);
+
+    if (cliente == nullptr) {
+        std::cout << "ERRO: Cliente com codigo " << codigo << " nao encontrado." << std::endl;
+    } else {
+        std::cout << "--- Pontos de Fidelidade ---" << std::endl;
+        std::cout << "Cliente: " << cliente->obterNome() << std::endl;
+        std::cout << "Total de Pontos: " << cliente->obterPontosFidelidade() << std::endl;
+    }
+}
 
 int main() {
     SistemaHotel sistema;
@@ -244,6 +330,15 @@ int main() {
                 break;
             case 6:
                 processarCadastroEstadia(sistema);
+                break;
+            case 7:
+                processarBaixaEstadia(sistema);
+                break;
+            case 8:
+                processarEstadiasCliente(sistema);
+                break;
+            case 9:
+                processarPontosFidelidade(sistema);
                 break;
             case 0:
                 std::cout << "Encerrando e salvando..." << std::endl;
