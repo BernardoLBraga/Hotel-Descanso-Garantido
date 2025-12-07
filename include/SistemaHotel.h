@@ -34,21 +34,21 @@ private:
 
 public:
     int cadastrarQuarto(int numero, int capacidade, float valorDiaria);
-    int cadastrarCliente(int codigo, std::string nome, std::string endereco, std::string telefone);
-    int cadastrarFuncionario(int codigo, std::string nome, std::string telefone, std::string cargo, float salario);
+    int cadastrarCliente(int codigo, const char* nome, const char* endereco, const char* telefone);
+    int cadastrarFuncionario(int codigo, const char* nome, const char* telefone, const char* cargo, float salario);
     
-    std::vector<Cliente> pesquisarCliente(int codigo, const std::string& nome);
-    std::vector<Funcionario> pesquisarFuncionario(int codigo, const std::string& nome);
+    std::vector<Cliente> pesquisarCliente(int codigo, const char* nome);
+    std::vector<Funcionario> pesquisarFuncionario(int codigo, const char* nome);
     
-    int cadastrarEstadia(int codigoCliente, int numeroQuarto, const std::string& dataEntrada, const std::string& dataSaida);
+    int cadastrarEstadia(int codigoCliente, int numeroQuarto, const char* dataEntrada, const char* dataSaida);
     int darBaixaEstadia(int codigoEstadia, float& valorTotalPago);
     
-    std::vector<Estadia> buscarEstadiasCliente(int codigo, const std::string& nome);
+    std::vector<Estadia> buscarEstadiasCliente(int codigo, const char* nome);
 
     int gravarDados();
     int lerDados();
 
-    int calcularDiarias(const std::string& dataEntrada, const std::string& dataSaida); 
+    int calcularDiarias(const char* dataEntrada, const char* dataSaida); 
     
     Cliente* buscarClientePorCodigo(int codigo);
     Quarto* buscarQuartoPorNumero(int numero);

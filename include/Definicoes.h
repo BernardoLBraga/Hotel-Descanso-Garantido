@@ -5,6 +5,6 @@
 #define MAX_ENDERECO 100
 #define MAX_TELEFONE 15
 #define MAX_CARGO 30
-#define MAX_DATA 11 
+#define MAX_DATA 11
 
 #endif
