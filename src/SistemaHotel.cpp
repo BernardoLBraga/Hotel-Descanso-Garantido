@@ -1,16 +1,14 @@
 #include "../include/SistemaHotel.h"
 #include <algorithm>
 #include <iostream>
-#include <string>
-#include <vector>
+#include <cstring>
 #include <fstream>
+#include <vector>
 
 #define ARQUIVO_CLIENTES "clientes.bin"
 #define ARQUIVO_QUARTOS "quartos.bin"
 #define ARQUIVO_FUNCIONARIOS "funcionarios.bin"
 #define ARQUIVO_ESTADIAS "estadias.bin"
-
-// --- Auxiliares de Persistência ---
 
 template <typename T>
 int gravarColecao(const std::vector<T>& colecao, const std::string& nomeArquivo) {
@@ -38,7 +36,10 @@ int lerColecao(std::vector<T>& colecao, const std::string& nomeArquivo) {
     }
     
     size_t tamanho;
-    arquivo.read(reinterpret_cast<char*>(&tamanho), sizeof(size_t));
+    if (!arquivo.read(reinterpret_cast<char*>(&tamanho), sizeof(size_t))) {
+        arquivo.close();
+        return SUCESSO;
+    }
     
     if (tamanho > 0) {
         colecao.resize(tamanho);
@@ -65,7 +66,7 @@ int SistemaHotel::cadastrarQuarto(int numero, int capacidade, float valorDiaria)
     return SUCESSO;
 }
 
-int SistemaHotel::cadastrarCliente(int codigo, std::string nome, std::string endereco, std::string telefone) {
+int SistemaHotel::cadastrarCliente(int codigo, const char* nome, const char* endereco, const char* telefone) {
     if (codigo <= 0 || buscarClientePorCodigo(codigo) != nullptr) {
         return ERRO_CODIGO;
     }
@@ -73,7 +74,7 @@ int SistemaHotel::cadastrarCliente(int codigo, std::string nome, std::string end
     return SUCESSO;
 }
 
-int SistemaHotel::cadastrarFuncionario(int codigo, std::string nome, std::string telefone, std::string cargo, float salario) {
+int SistemaHotel::cadastrarFuncionario(int codigo, const char* nome, const char* telefone, const char* cargo, float salario) {
     if (codigo <= 0) {
         return ERRO_CODIGO;
     }
@@ -83,7 +84,7 @@ int SistemaHotel::cadastrarFuncionario(int codigo, std::string nome, std::string
     if (salario <= 0.0f) {
         return ERRO_SALARIO;
     }
-    if (cargo.empty()) {
+    if (std::strlen(cargo) == 0) {
         return ERRO_CARGO;
     }
     funcionarios.emplace_back(codigo, nome, telefone, cargo, salario);
@@ -92,16 +93,16 @@ int SistemaHotel::cadastrarFuncionario(int codigo, std::string nome, std::string
 
 // --- Implementações de F9, F10 (Pesquisas) ---
 
-std::vector<Cliente> SistemaHotel::pesquisarCliente(int codigo, const std::string& nome) {
+std::vector<Cliente> SistemaHotel::pesquisarCliente(int codigo, const char* nome) {
     std::vector<Cliente> resultados;
     if (codigo > 0) {
         Cliente* c = buscarClientePorCodigo(codigo);
         if (c != nullptr) {
             resultados.push_back(*c);
         }
-    } else if (!nome.empty()) {
+    } else if (std::strlen(nome) > 0) {
         for (const auto& c : clientes) {
-            if (c.obterNome().find(nome) != std::string::npos) {
+            if (std::strstr(c.obterNome(), nome) != nullptr) {
                 resultados.push_back(c);
             }
         }
@@ -109,16 +110,16 @@ std::vector<Cliente> SistemaHotel::pesquisarCliente(int codigo, const std::strin
     return resultados;
 }
 
-std::vector<Funcionario> SistemaHotel::pesquisarFuncionario(int codigo, const std::string& nome) {
+std::vector<Funcionario> SistemaHotel::pesquisarFuncionario(int codigo, const char* nome) {
     std::vector<Funcionario> resultados;
     if (codigo > 0) {
         auto it = std::find_if(funcionarios.begin(), funcionarios.end(), [codigo](const Funcionario& f){ return f.obterCodigo() == codigo; });
         if (it != funcionarios.end()) {
             resultados.push_back(*it);
         }
-    } else if (!nome.empty()) {
+    } else if (std::strlen(nome) > 0) {
         for (const auto& f : funcionarios) {
-            if (f.obterNome().find(nome) != std::string::npos) {
+            if (std::strstr(f.obterNome(), nome) != nullptr) {
                 resultados.push_back(f);
             }
         }
@@ -154,14 +155,14 @@ Estadia* SistemaHotel::buscarEstadiaPorCodigo(int codigo) {
 
 // --- Implementação da Sprint 3 (F7) ---
 
-int SistemaHotel::calcularDiarias(const std::string& dataEntrada, const std::string& dataSaida) {
-    if (dataEntrada.empty() || dataSaida.empty()) {
+int SistemaHotel::calcularDiarias(const char* dataEntrada, const char* dataSaida) {
+    if (std::strlen(dataEntrada) == 0 || std::strlen(dataSaida) == 0) {
         return 0;
     }
     return 5;
 }
 
-int SistemaHotel::cadastrarEstadia(int codigoCliente, int numeroQuarto, const std::string& dataEntrada, const std::string& dataSaida) {
+int SistemaHotel::cadastrarEstadia(int codigoCliente, int numeroQuarto, const char* dataEntrada, const char* dataSaida) {
     Cliente* cliente = buscarClientePorCodigo(codigoCliente);
     if (cliente == nullptr) {
         return ERRO_CLIENTE_NAO_ENCONTRADO;
@@ -172,7 +173,7 @@ int SistemaHotel::cadastrarEstadia(int codigoCliente, int numeroQuarto, const st
         return ERRO_QUARTO_NAO_ENCONTRADO;
     }
     
-    if (quarto->obterStatus() == "OCUPADO") {
+    if (std::strcmp(quarto->obterStatus(), "OCUPADO") == 0) {
         return ERRO_QUARTO_OCUPADO;
     }
     
@@ -206,7 +207,7 @@ int SistemaHotel::darBaixaEstadia(int codigoEstadia, float& valorTotalPago) {
         return ERRO_QUARTO_NAO_ENCONTRADO;
     }
     
-    if (quarto->obterStatus() == "DESOCUPADO") {
+    if (std::strcmp(quarto->obterStatus(), "DESOCUPADO") == 0) {
         return ERRO_ESTADIA_JA_FINALIZADA;
     }
     
@@ -222,7 +223,7 @@ int SistemaHotel::darBaixaEstadia(int codigoEstadia, float& valorTotalPago) {
     return SUCESSO;
 }
 
-std::vector<Estadia> SistemaHotel::buscarEstadiasCliente(int codigo, const std::string& nome) {
+std::vector<Estadia> SistemaHotel::buscarEstadiasCliente(int codigo, const char* nome) {
     std::vector<Estadia> resultados;
 
     if (codigo > 0) {
@@ -231,9 +232,9 @@ std::vector<Estadia> SistemaHotel::buscarEstadiasCliente(int codigo, const std::
                 resultados.push_back(estadia);
             }
         }
-    } else if (!nome.empty()) {
+    } else if (std::strlen(nome) > 0) {
         for (const auto& cliente : clientes) {
-            if (cliente.obterNome().find(nome) != std::string::npos) {
+            if (std::strstr(cliente.obterNome(), nome) != nullptr) {
                 for (const auto& estadia : estadias) {
                     if (estadia.obterCodigoCliente() == cliente.obterCodigo()) {
                         resultados.push_back(estadia);
@@ -249,8 +250,6 @@ std::vector<Estadia> SistemaHotel::buscarEstadiasCliente(int codigo, const std::
 
     return resultados;
 }
-
-// --- Implementação da Persistência (F5/F6) ---
 
 int SistemaHotel::gravarDados() {
     int resultado;

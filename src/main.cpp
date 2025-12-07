@@ -62,19 +62,19 @@ void processarCadastroQuarto(SistemaHotel& sistema) {
 
 void processarCadastroCliente(SistemaHotel& sistema) {
     int codigo;
-    std::string nome, endereco, telefone;
+    std::string nomeStr, enderecoStr, telefoneStr;
 
     std::cout << "Codigo do Cliente: ";
     std::cin >> codigo;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::cout << "Nome: ";
-    std::getline(std::cin, nome);
+    std::getline(std::cin, nomeStr);
     std::cout << "Endereco: ";
-    std::getline(std::cin, endereco);
+    std::getline(std::cin, enderecoStr);
     std::cout << "Telefone: ";
-    std::getline(std::cin, telefone);
+    std::getline(std::cin, telefoneStr);
 
-    int resultado = sistema.cadastrarCliente(codigo, nome, endereco, telefone);
+    int resultado = sistema.cadastrarCliente(codigo, nomeStr.c_str(), enderecoStr.c_str(), telefoneStr.c_str());
 
     if (resultado == SUCESSO) {
         std::cout << "Cliente cadastrado com sucesso!" << std::endl;
@@ -86,22 +86,22 @@ void processarCadastroCliente(SistemaHotel& sistema) {
 void processarCadastroFuncionario(SistemaHotel& sistema) {
     int codigo;
     float salario;
-    std::string nome, telefone, cargo;
+    std::string nomeStr, telefoneStr, cargoStr;
 
     std::cout << "Codigo do Funcionario: ";
     std::cin >> codigo;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::cout << "Nome: ";
-    std::getline(std::cin, nome);
+    std::getline(std::cin, nomeStr);
     std::cout << "Telefone: ";
-    std::getline(std::cin, telefone);
+    std::getline(std::cin, telefoneStr);
     std::cout << "Cargo: ";
-    std::getline(std::cin, cargo);
+    std::getline(std::cin, cargoStr);
     std::cout << "Salario: ";
     std::cin >> salario;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    int resultado = sistema.cadastrarFuncionario(codigo, nome, telefone, cargo, salario);
+    int resultado = sistema.cadastrarFuncionario(codigo, nomeStr.c_str(), telefoneStr.c_str(), cargoStr.c_str(), salario);
 
     if (resultado == SUCESSO) {
         std::cout << "Funcionario cadastrado com sucesso!" << std::endl;
@@ -115,8 +115,8 @@ void processarCadastroFuncionario(SistemaHotel& sistema) {
 }
 
 void processarPesquisaCliente(SistemaHotel& sistema) {
-    int codigo;
-    std::string nome;
+    int codigo = 0;
+    std::string nomeStr;
 
     std::cout << "Pesquisar por (1) Codigo ou (2) Nome? ";
     int tipo_pesquisa;
@@ -127,17 +127,15 @@ void processarPesquisaCliente(SistemaHotel& sistema) {
         std::cout << "Digite o Codigo: ";
         std::cin >> codigo;
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        nome = "";
     } else if (tipo_pesquisa == 2) {
-        codigo = 0;
         std::cout << "Digite o Nome: ";
-        std::getline(std::cin, nome);
+        std::getline(std::cin, nomeStr);
     } else {
         std::cout << "Opcao invalida." << std::endl;
         return;
     }
 
-    std::vector<Cliente> resultados = sistema.pesquisarCliente(codigo, nome);
+    std::vector<Cliente> resultados = sistema.pesquisarCliente(codigo, nomeStr.c_str());
 
     if (resultados.empty()) {
         std::cout << "Nenhum cliente encontrado." << std::endl;
@@ -152,8 +150,8 @@ void processarPesquisaCliente(SistemaHotel& sistema) {
 }
 
 void processarPesquisaFuncionario(SistemaHotel& sistema) {
-    int codigo;
-    std::string nome;
+    int codigo = 0;
+    std::string nomeStr;
 
     std::cout << "Pesquisar por (1) Codigo ou (2) Nome? ";
     int tipo_pesquisa;
@@ -164,17 +162,15 @@ void processarPesquisaFuncionario(SistemaHotel& sistema) {
         std::cout << "Digite o Codigo: ";
         std::cin >> codigo;
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        nome = "";
     } else if (tipo_pesquisa == 2) {
-        codigo = 0;
         std::cout << "Digite o Nome: ";
-        std::getline(std::cin, nome);
+        std::getline(std::cin, nomeStr);
     } else {
         std::cout << "Opcao invalida." << std::endl;
         return;
     }
 
-    std::vector<Funcionario> resultados = sistema.pesquisarFuncionario(codigo, nome);
+    std::vector<Funcionario> resultados = sistema.pesquisarFuncionario(codigo, nomeStr.c_str());
 
     if (resultados.empty()) {
         std::cout << "Nenhum funcionario encontrado." << std::endl;
@@ -190,7 +186,7 @@ void processarPesquisaFuncionario(SistemaHotel& sistema) {
 
 void processarCadastroEstadia(SistemaHotel& sistema) {
     int codCliente, numQuarto;
-    std::string dataEntrada, dataSaida;
+    std::string dataEntradaStr, dataSaidaStr;
 
     std::cout << "Codigo do Cliente: ";
     std::cin >> codCliente;
@@ -199,11 +195,11 @@ void processarCadastroEstadia(SistemaHotel& sistema) {
     std::cin >> numQuarto;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::cout << "Data de Entrada (DD/MM/AAAA): ";
-    std::getline(std::cin, dataEntrada);
+    std::getline(std::cin, dataEntradaStr);
     std::cout << "Data de Saida (DD/MM/AAAA): ";
-    std::getline(std::cin, dataSaida);
+    std::getline(std::cin, dataSaidaStr);
 
-    int resultado = sistema.cadastrarEstadia(codCliente, numQuarto, dataEntrada, dataSaida);
+    int resultado = sistema.cadastrarEstadia(codCliente, numQuarto, dataEntradaStr.c_str(), dataSaidaStr.c_str());
 
     if (resultado == SUCESSO) {
         std::cout << "Estadia cadastrada com sucesso! Quarto agora ocupado." << std::endl;
@@ -242,8 +238,8 @@ void processarBaixaEstadia(SistemaHotel& sistema) {
 }
 
 void processarEstadiasCliente(SistemaHotel& sistema) {
-    int codigo;
-    std::string nome;
+    int codigo = 0;
+    std::string nomeStr;
 
     std::cout << "Pesquisar estadias por (1) Codigo do Cliente ou (2) Nome do Cliente? ";
     int tipo_pesquisa;
@@ -254,17 +250,15 @@ void processarEstadiasCliente(SistemaHotel& sistema) {
         std::cout << "Digite o Codigo do Cliente: ";
         std::cin >> codigo;
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        nome = "";
     } else if (tipo_pesquisa == 2) {
-        codigo = 0;
         std::cout << "Digite o Nome do Cliente: ";
-        std::getline(std::cin, nome);
+        std::getline(std::cin, nomeStr);
     } else {
         std::cout << "Opcao invalida." << std::endl;
         return;
     }
 
-    std::vector<Estadia> resultados = sistema.buscarEstadiasCliente(codigo, nome);
+    std::vector<Estadia> resultados = sistema.buscarEstadiasCliente(codigo, nomeStr.c_str());
     
     if (resultados.empty()) {
         std::cout << "Nenhuma estadia encontrada para o cliente." << std::endl;
