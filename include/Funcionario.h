@@ -1,26 +1,24 @@
 #ifndef FUNCIONARIO_H
 #define FUNCIONARIO_H
 
-#include <string>
+#include "Definicoes.h"
 
 class Funcionario {
 private:
     int codigo;
-    std::string nome;
-    std::string telefone;
-    std::string cargo;
+    char nome[MAX_NOME];
+    char telefone[MAX_TELEFONE];
+    char cargo[MAX_CARGO];
     float salario;
 
 public:
-    Funcionario(int cod, std::string nom, std::string tel, std::string car, float sal) : 
-        codigo(cod), nome(nom), telefone(tel), cargo(car), salario(sal) {}
-    
-    Funcionario() : codigo(0), salario(0.0) {}
+    Funcionario(int cod, const char* n, const char* tel, const char* c, float sal);
+    Funcionario() : codigo(0), salario(0.0f) {}
     
     int obterCodigo() const { return codigo; }
-    std::string obterNome() const { return nome; }
-    std::string obterTelefone() const { return telefone; }
-    std::string obterCargo() const { return cargo; }
+    const char* obterNome() const { return nome; }
+    const char* obterTelefone() const { return telefone; }
+    const char* obterCargo() const { return cargo; }
     float obterSalario() const { return salario; }
 };
 
