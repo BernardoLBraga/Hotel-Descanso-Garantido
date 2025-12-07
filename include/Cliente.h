@@ -1,26 +1,24 @@
 #ifndef CLIENTE_H
 #define CLIENTE_H
 
-#include <string>
+#include "Definicoes.h"
 
 class Cliente {
 private:
     int codigo;
-    std::string nome;
-    std::string endereco;
-    std::string telefone;
+    char nome[MAX_NOME];
+    char endereco[MAX_ENDERECO];
+    char telefone[MAX_TELEFONE];
     int pontosFidelidade;
 
 public:
-    Cliente(int cod, std::string n, std::string end, std::string tel) : 
-        codigo(cod), nome(n), endereco(end), telefone(tel), pontosFidelidade(0) {}
-    
+    Cliente(int cod, const char* n, const char* end, const char* tel);
     Cliente() : codigo(0), pontosFidelidade(0) {}
     
     int obterCodigo() const { return codigo; }
-    std::string obterNome() const { return nome; }
-    std::string obterEndereco() const { return endereco; }
-    std::string obterTelefone() const { return telefone; }
+    const char* obterNome() const { return nome; }
+    const char* obterEndereco() const { return endereco; }
+    const char* obterTelefone() const { return telefone; }
     
     int obterPontosFidelidade() const { return pontosFidelidade; }
     void adicionarPontos(int pontos) { pontosFidelidade += pontos; }
