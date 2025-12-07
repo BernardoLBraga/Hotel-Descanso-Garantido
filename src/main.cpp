@@ -5,23 +5,76 @@
 #include "../include/SistemaHotel.h"
 #include "../include/Cliente.h"
 #include "../include/Funcionario.h"
+#include "../include/Quarto.h"
+#include "../include/Estadia.h"
 
 void processarCadastroQuarto(SistemaHotel& sistema);
 void processarCadastroCliente(SistemaHotel& sistema);
 void processarCadastroFuncionario(SistemaHotel& sistema); 
-
 void processarPesquisaCliente(SistemaHotel& sistema);
 void processarPesquisaFuncionario(SistemaHotel& sistema);
+void processarCadastroEstadia(SistemaHotel& sistema);
+
 
 void exibirMenu() {
     std::cout << "\n--- MENU PRINCIPAL ---" << std::endl;
     std::cout << "1. Cadastrar Quarto" << std::endl;
     std::cout << "2. Cadastrar Cliente" << std::endl;
     std::cout << "3. Cadastrar Funcionario" << std::endl;
-    std::cout << "4. Pesquisar Cliente" << std::endl;   
+    std::cout << "4. Pesquisar Cliente" << std::endl;
     std::cout << "5. Pesquisar Funcionario" << std::endl;
+    std::cout << "6. Cadastrar Estadia" << std::endl;
     std::cout << "0. Sair e Salvar" << std::endl;
     std::cout << "Escolha uma opcao: ";
+}
+
+
+void processarCadastroQuarto(SistemaHotel& sistema) {
+    int numero, capacidade;
+    float valorDiaria;
+
+    std::cout << "Numero do Quarto: ";
+    std::cin >> numero;
+    std::cout << "Capacidade de Hospedes: ";
+    std::cin >> capacidade;
+    std::cout << "Valor da Diaria: ";
+    std::cin >> valorDiaria;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    int resultado = sistema.cadastrarQuarto(numero, capacidade, valorDiaria);
+
+    if (resultado == SUCESSO) {
+        std::cout << "Quarto cadastrado com sucesso!" << std::endl;
+    } else if (resultado == ERRO_DUPLICIDADE) {
+        std::cout << "ERRO: Numero de quarto ja cadastrado." << std::endl;
+    } else if (resultado == ERRO_CAPACIDADE) {
+        std::cout << "ERRO: Capacidade de hospedes deve ser positiva." << std::endl;
+    } else if (resultado == ERRO_VALOR) {
+        std::cout << "ERRO: Valor da diaria deve ser positivo." << std::endl;
+    }
+}
+
+void processarCadastroCliente(SistemaHotel& sistema) {
+    int codigo;
+    std::string nome, endereco, telefone;
+
+    std::cout << "Codigo do Cliente: ";
+    std::cin >> codigo;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Nome: ";
+    std::getline(std::cin, nome);
+    std::cout << "Endereco: ";
+    std::getline(std::cin, endereco);
+    std::cout << "Telefone: ";
+    std::getline(std::cin, telefone);
+
+    int resultado = sistema.cadastrarCliente(codigo, nome, endereco, telefone);
+
+    if (resultado == SUCESSO) {
+        std::cout << "Cliente cadastrado com sucesso!" << std::endl;
+    } else if (resultado == ERRO_CODIGO) {
+        std::cout << "ERRO: Codigo de cliente invalido ou ja cadastrado." << std::endl;
+    }
 }
 
 void processarCadastroFuncionario(SistemaHotel& sistema) {
@@ -40,6 +93,7 @@ void processarCadastroFuncionario(SistemaHotel& sistema) {
     std::getline(std::cin, cargo);
     std::cout << "Salario: ";
     std::cin >> salario;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     int resultado = sistema.cadastrarFuncionario(codigo, nome, telefone, cargo, salario);
 
@@ -66,6 +120,7 @@ void processarPesquisaCliente(SistemaHotel& sistema) {
     if (tipo_pesquisa == 1) {
         std::cout << "Digite o Codigo: ";
         std::cin >> codigo;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         nome = "";
     } else if (tipo_pesquisa == 2) {
         codigo = 0;
@@ -101,6 +156,7 @@ void processarPesquisaFuncionario(SistemaHotel& sistema) {
     if (tipo_pesquisa == 1) {
         std::cout << "Digite o Codigo: ";
         std::cin >> codigo;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         nome = "";
     } else if (tipo_pesquisa == 2) {
         codigo = 0;
@@ -125,6 +181,37 @@ void processarPesquisaFuncionario(SistemaHotel& sistema) {
     }
 }
 
+void processarCadastroEstadia(SistemaHotel& sistema) {
+    int codCliente, numQuarto;
+    std::string dataEntrada, dataSaida;
+
+    std::cout << "Codigo do Cliente: ";
+    std::cin >> codCliente;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Numero do Quarto: ";
+    std::cin >> numQuarto;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Data de Entrada (DD/MM/AAAA): ";
+    std::getline(std::cin, dataEntrada);
+    std::cout << "Data de Saida (DD/MM/AAAA): ";
+    std::getline(std::cin, dataSaida);
+
+    int resultado = sistema.cadastrarEstadia(codCliente, numQuarto, dataEntrada, dataSaida);
+
+    if (resultado == SUCESSO) {
+        std::cout << "Estadia cadastrada com sucesso! Quarto agora ocupado." << std::endl;
+    } else if (resultado == ERRO_CLIENTE_NAO_ENCONTRADO) {
+        std::cout << "ERRO: Cliente nao encontrado. Cadastre o cliente primeiro." << std::endl;
+    } else if (resultado == ERRO_QUARTO_NAO_ENCONTRADO) {
+        std::cout << "ERRO: Quarto nao encontrado." << std::endl;
+    } else if (resultado == ERRO_QUARTO_OCUPADO) {
+        std::cout << "ERRO: O quarto ja esta ocupado." << std::endl;
+    } else if (resultado == ERRO_DATA_INVALIDA) {
+        std::cout << "ERRO: As datas de entrada/saida sao invalidas." << std::endl;
+    }
+}
+
+
 int main() {
     SistemaHotel sistema;
     int opcao = 0;
@@ -138,7 +225,7 @@ int main() {
             std::cout << "Opcao invalida. Tente novamente." << std::endl;
             continue;
         }
-        
+
         switch (opcao) {
             case 1:
                 processarCadastroQuarto(sistema);
@@ -150,10 +237,13 @@ int main() {
                 processarCadastroFuncionario(sistema);
                 break;
             case 4:
-                processarPesquisaCliente(sistema);  
+                processarPesquisaCliente(sistema);
                 break;
             case 5:
                 processarPesquisaFuncionario(sistema);
+                break;
+            case 6:
+                processarCadastroEstadia(sistema);
                 break;
             case 0:
                 std::cout << "Encerrando e salvando..." << std::endl;
