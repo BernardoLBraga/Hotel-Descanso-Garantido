@@ -50,8 +50,6 @@ int lerColecao(std::vector<T>& colecao, const std::string& nomeArquivo) {
     return SUCESSO;
 }
 
-// --- Implementações de F1, F2, F3 ---
-
 int SistemaHotel::cadastrarQuarto(int numero, int capacidade, float valorDiaria) {
     if (buscarQuartoPorNumero(numero) != nullptr) {
         return ERRO_DUPLICIDADE;
@@ -91,8 +89,6 @@ int SistemaHotel::cadastrarFuncionario(int codigo, const char* nome, const char*
     return SUCESSO;
 }
 
-// --- Implementações de F9, F10 (Pesquisas) ---
-
 std::vector<Cliente> SistemaHotel::pesquisarCliente(int codigo, const char* nome) {
     std::vector<Cliente> resultados;
     if (codigo > 0) {
@@ -127,8 +123,6 @@ std::vector<Funcionario> SistemaHotel::pesquisarFuncionario(int codigo, const ch
     return resultados;
 }
 
-// --- Funções Auxiliares de Busca ---
-
 Cliente* SistemaHotel::buscarClientePorCodigo(int codigo) {
     auto it = std::find_if(clientes.begin(), clientes.end(), 
         [codigo](const Cliente& c){
@@ -152,8 +146,6 @@ Estadia* SistemaHotel::buscarEstadiaPorCodigo(int codigo) {
         });
     return (it != estadias.end()) ? &(*it) : nullptr;
 }
-
-// --- Implementação da Sprint 3 (F7) ---
 
 int SistemaHotel::calcularDiarias(const char* dataEntrada, const char* dataSaida) {
     if (std::strlen(dataEntrada) == 0 || std::strlen(dataSaida) == 0) {
@@ -189,8 +181,6 @@ int SistemaHotel::cadastrarEstadia(int codigoCliente, int numeroQuarto, const ch
     
     return SUCESSO;
 }
-
-// --- Implementação da Sprint 4 (F8 e F7.1) ---
 
 int SistemaHotel::darBaixaEstadia(int codigoEstadia, float& valorTotalPago) {
     Estadia* estadia = buscarEstadiaPorCodigo(codigoEstadia);
