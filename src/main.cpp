@@ -302,6 +302,8 @@ int main() {
     SistemaHotel sistema;
     int opcao = 0;
     
+    sistema.lerDados(); 
+    
     do {
         exibirMenu();
         if (!(std::cin >> opcao)) {
@@ -342,6 +344,7 @@ int main() {
                 break;
             case 0:
                 std::cout << "Encerrando e salvando..." << std::endl;
+                sistema.gravarDados();
                 break;
             default:
                 std::cout << "Opcao invalida. Tente novamente." << std::endl;

@@ -3,58 +3,130 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
+
+#define ARQUIVO_CLIENTES "clientes.bin"
+#define ARQUIVO_QUARTOS "quartos.bin"
+#define ARQUIVO_FUNCIONARIOS "funcionarios.bin"
+#define ARQUIVO_ESTADIAS "estadias.bin"
+
+// --- Auxiliares de Persistência ---
+
+template <typename T>
+int gravarColecao(const std::vector<T>& colecao, const std::string& nomeArquivo) {
+    std::ofstream arquivo(nomeArquivo, std::ios::binary | std::ios::out);
+    if (!arquivo.is_open()) {
+        return ERRO_ESCRITA_ARQUIVO;
+    }
+    
+    size_t tamanho = colecao.size();
+    arquivo.write(reinterpret_cast<const char*>(&tamanho), sizeof(size_t));
+    
+    if (tamanho > 0) {
+        arquivo.write(reinterpret_cast<const char*>(colecao.data()), tamanho * sizeof(T));
+    }
+    
+    arquivo.close();
+    return SUCESSO;
+}
+
+template <typename T>
+int lerColecao(std::vector<T>& colecao, const std::string& nomeArquivo) {
+    std::ifstream arquivo(nomeArquivo, std::ios::binary | std::ios::in);
+    if (!arquivo.is_open()) {
+        return ERRO_LEITURA_ARQUIVO;
+    }
+    
+    size_t tamanho;
+    arquivo.read(reinterpret_cast<char*>(&tamanho), sizeof(size_t));
+    
+    if (tamanho > 0) {
+        colecao.resize(tamanho);
+        arquivo.read(reinterpret_cast<char*>(colecao.data()), tamanho * sizeof(T));
+    }
+    
+    arquivo.close();
+    return SUCESSO;
+}
+
+// --- Implementações de F1, F2, F3 ---
+
+int SistemaHotel::cadastrarQuarto(int numero, int capacidade, float valorDiaria) {
+    if (buscarQuartoPorNumero(numero) != nullptr) {
+        return ERRO_DUPLICIDADE;
+    }
+    if (capacidade <= 0) {
+        return ERRO_CAPACIDADE;
+    }
+    if (valorDiaria <= 0) {
+        return ERRO_VALOR;
+    }
+    quartos.emplace_back(numero, capacidade, valorDiaria, "DESOCUPADO");
+    return SUCESSO;
+}
+
+int SistemaHotel::cadastrarCliente(int codigo, std::string nome, std::string endereco, std::string telefone) {
+    if (codigo <= 0 || buscarClientePorCodigo(codigo) != nullptr) {
+        return ERRO_CODIGO;
+    }
+    clientes.emplace_back(codigo, nome, endereco, telefone);
+    return SUCESSO;
+}
+
+int SistemaHotel::cadastrarFuncionario(int codigo, std::string nome, std::string telefone, std::string cargo, float salario) {
+    if (codigo <= 0) {
+        return ERRO_CODIGO;
+    }
+    if (std::any_of(funcionarios.begin(), funcionarios.end(), [codigo](const Funcionario& f){ return f.obterCodigo() == codigo; })) {
+        return ERRO_CODIGO;
+    }
+    if (salario <= 0.0f) {
+        return ERRO_SALARIO;
+    }
+    if (cargo.empty()) {
+        return ERRO_CARGO;
+    }
+    funcionarios.emplace_back(codigo, nome, telefone, cargo, salario);
+    return SUCESSO;
+}
+
+// --- Implementações de F9, F10 (Pesquisas) ---
 
 std::vector<Cliente> SistemaHotel::pesquisarCliente(int codigo, const std::string& nome) {
     std::vector<Cliente> resultados;
-    
     if (codigo > 0) {
-        auto it = std::find_if(clientes.begin(), clientes.end(), 
-            [codigo](const Cliente& c){
-                return c.obterCodigo() == codigo;
-            });
-        
-        if (it != clientes.end()) {
-            resultados.push_back(*it);
-            return resultados;
+        Cliente* c = buscarClientePorCodigo(codigo);
+        if (c != nullptr) {
+            resultados.push_back(*c);
         }
-    }
-    
-    if (!nome.empty()) {
-        for (const auto& cliente : clientes) {
-            if (cliente.obterNome().find(nome) != std::string::npos) {
-                resultados.push_back(cliente);
+    } else if (!nome.empty()) {
+        for (const auto& c : clientes) {
+            if (c.obterNome().find(nome) != std::string::npos) {
+                resultados.push_back(c);
             }
         }
     }
-
     return resultados;
 }
 
 std::vector<Funcionario> SistemaHotel::pesquisarFuncionario(int codigo, const std::string& nome) {
     std::vector<Funcionario> resultados;
-    
     if (codigo > 0) {
-        auto it = std::find_if(funcionarios.begin(), funcionarios.end(), 
-            [codigo](const Funcionario& f){
-                return f.obterCodigo() == codigo;
-            });
-        
+        auto it = std::find_if(funcionarios.begin(), funcionarios.end(), [codigo](const Funcionario& f){ return f.obterCodigo() == codigo; });
         if (it != funcionarios.end()) {
             resultados.push_back(*it);
-            return resultados;
         }
-    }
-    
-    if (!nome.empty()) {
-        for (const auto& funcionario : funcionarios) {
-            if (funcionario.obterNome().find(nome) != std::string::npos) {
-                resultados.push_back(funcionario);
+    } else if (!nome.empty()) {
+        for (const auto& f : funcionarios) {
+            if (f.obterNome().find(nome) != std::string::npos) {
+                resultados.push_back(f);
             }
         }
     }
-
     return resultados;
 }
+
+// --- Funções Auxiliares de Busca ---
 
 Cliente* SistemaHotel::buscarClientePorCodigo(int codigo) {
     auto it = std::find_if(clientes.begin(), clientes.end(), 
@@ -71,6 +143,16 @@ Quarto* SistemaHotel::buscarQuartoPorNumero(int numero) {
         });
     return (it != quartos.end()) ? &(*it) : nullptr;
 }
+
+Estadia* SistemaHotel::buscarEstadiaPorCodigo(int codigo) {
+    auto it = std::find_if(estadias.begin(), estadias.end(), 
+        [codigo](const Estadia& e){
+            return e.obterCodigoEstadia() == codigo;
+        });
+    return (it != estadias.end()) ? &(*it) : nullptr;
+}
+
+// --- Implementação da Sprint 3 (F7) ---
 
 int SistemaHotel::calcularDiarias(const std::string& dataEntrada, const std::string& dataSaida) {
     if (dataEntrada.empty() || dataSaida.empty()) {
@@ -107,13 +189,7 @@ int SistemaHotel::cadastrarEstadia(int codigoCliente, int numeroQuarto, const st
     return SUCESSO;
 }
 
-Estadia* SistemaHotel::buscarEstadiaPorCodigo(int codigo) {
-    auto it = std::find_if(estadias.begin(), estadias.end(), 
-        [codigo](const Estadia& e){
-            return e.obterCodigoEstadia() == codigo;
-        });
-    return (it != estadias.end()) ? &(*it) : nullptr;
-}
+// --- Implementação da Sprint 4 (F8 e F7.1) ---
 
 int SistemaHotel::darBaixaEstadia(int codigoEstadia, float& valorTotalPago) {
     Estadia* estadia = buscarEstadiaPorCodigo(codigoEstadia);
@@ -155,8 +231,7 @@ std::vector<Estadia> SistemaHotel::buscarEstadiasCliente(int codigo, const std::
                 resultados.push_back(estadia);
             }
         }
-    } 
-    else if (!nome.empty()) {
+    } else if (!nome.empty()) {
         for (const auto& cliente : clientes) {
             if (cliente.obterNome().find(nome) != std::string::npos) {
                 for (const auto& estadia : estadias) {
@@ -173,4 +248,37 @@ std::vector<Estadia> SistemaHotel::buscarEstadiasCliente(int codigo, const std::
     }
 
     return resultados;
+}
+
+// --- Implementação da Persistência (F5/F6) ---
+
+int SistemaHotel::gravarDados() {
+    int resultado;
+    
+    resultado = gravarColecao(clientes, ARQUIVO_CLIENTES);
+    if (resultado != SUCESSO) return resultado;
+    
+    resultado = gravarColecao(quartos, ARQUIVO_QUARTOS);
+    if (resultado != SUCESSO) return resultado;
+
+    resultado = gravarColecao(funcionarios, ARQUIVO_FUNCIONARIOS);
+    if (resultado != SUCESSO) return resultado;
+
+    resultado = gravarColecao(estadias, ARQUIVO_ESTADIAS);
+    if (resultado != SUCESSO) return resultado;
+    
+    return SUCESSO;
+}
+
+int SistemaHotel::lerDados() {
+    lerColecao(clientes, ARQUIVO_CLIENTES);
+    lerColecao(quartos, ARQUIVO_QUARTOS);
+    lerColecao(funcionarios, ARQUIVO_FUNCIONARIOS);
+    lerColecao(estadias, ARQUIVO_ESTADIAS);
+    
+    if (!estadias.empty()) {
+        proximoCodigoEstadia = estadias.back().obterCodigoEstadia() + 1;
+    }
+
+    return SUCESSO; 
 }

@@ -23,7 +23,7 @@ public:
     std::string obterTelefone() const { return telefone; }
     
     int obterPontosFidelidade() const { return pontosFidelidade; }
-    void adicionarPontos(int pontos) { pontosFidelidade += pontos; } // NOVO MÉTODO
+    void adicionarPontos(int pontos) { pontosFidelidade += pontos; }
 };
 
 #endif

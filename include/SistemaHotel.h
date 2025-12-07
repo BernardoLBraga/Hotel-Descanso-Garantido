@@ -21,6 +21,8 @@
 #define ERRO_DATA_INVALIDA 10
 #define ERRO_ESTADIA_NAO_ENCONTRADA 11
 #define ERRO_ESTADIA_JA_FINALIZADA 12
+#define ERRO_LEITURA_ARQUIVO 13
+#define ERRO_ESCRITA_ARQUIVO 14
 
 class SistemaHotel {
 private:
@@ -42,6 +44,9 @@ public:
     int darBaixaEstadia(int codigoEstadia, float& valorTotalPago);
     
     std::vector<Estadia> buscarEstadiasCliente(int codigo, const std::string& nome);
+
+    int gravarDados();
+    int lerDados();
 
     int calcularDiarias(const std::string& dataEntrada, const std::string& dataSaida); 
     
