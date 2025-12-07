@@ -19,6 +19,8 @@
 #define ERRO_QUARTO_NAO_ENCONTRADO 8
 #define ERRO_QUARTO_OCUPADO 9
 #define ERRO_DATA_INVALIDA 10
+#define ERRO_ESTADIA_NAO_ENCONTRADA 11
+#define ERRO_ESTADIA_JA_FINALIZADA 12
 
 class SistemaHotel {
 private:
@@ -37,12 +39,16 @@ public:
     std::vector<Funcionario> pesquisarFuncionario(int codigo, const std::string& nome);
     
     int cadastrarEstadia(int codigoCliente, int numeroQuarto, const std::string& dataEntrada, const std::string& dataSaida);
+    int darBaixaEstadia(int codigoEstadia, float& valorTotalPago);
     
+    std::vector<Estadia> buscarEstadiasCliente(int codigo, const std::string& nome);
+
     int calcularDiarias(const std::string& dataEntrada, const std::string& dataSaida); 
     
     Cliente* buscarClientePorCodigo(int codigo);
     Quarto* buscarQuartoPorNumero(int numero);
-    
+    Estadia* buscarEstadiaPorCodigo(int codigo);
+
     std::vector<Quarto>& obterQuartos() { return quartos; }
     void limparQuartos() { quartos.clear(); }
     
