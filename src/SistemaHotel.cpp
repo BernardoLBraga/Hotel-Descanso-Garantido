@@ -106,3 +106,71 @@ int SistemaHotel::cadastrarEstadia(int codigoCliente, int numeroQuarto, const st
     
     return SUCESSO;
 }
+
+Estadia* SistemaHotel::buscarEstadiaPorCodigo(int codigo) {
+    auto it = std::find_if(estadias.begin(), estadias.end(), 
+        [codigo](const Estadia& e){
+            return e.obterCodigoEstadia() == codigo;
+        });
+    return (it != estadias.end()) ? &(*it) : nullptr;
+}
+
+int SistemaHotel::darBaixaEstadia(int codigoEstadia, float& valorTotalPago) {
+    Estadia* estadia = buscarEstadiaPorCodigo(codigoEstadia);
+    if (estadia == nullptr) {
+        return ERRO_ESTADIA_NAO_ENCONTRADA;
+    }
+
+    Cliente* cliente = buscarClientePorCodigo(estadia->obterCodigoCliente());
+    Quarto* quarto = buscarQuartoPorNumero(estadia->obterNumeroQuarto());
+
+    int qtdDiarias = estadia->obterQtdDiarias();
+    
+    if (quarto == nullptr) {
+        return ERRO_QUARTO_NAO_ENCONTRADO;
+    }
+    
+    if (quarto->obterStatus() == "DESOCUPADO") {
+        return ERRO_ESTADIA_JA_FINALIZADA;
+    }
+    
+    valorTotalPago = qtdDiarias * quarto->obterValorDiaria();
+
+    if (cliente != nullptr) {
+        int pontosGanhos = qtdDiarias * 10;
+        cliente->adicionarPontos(pontosGanhos);
+    }
+
+    quarto->definirStatus("DESOCUPADO");
+
+    return SUCESSO;
+}
+
+std::vector<Estadia> SistemaHotel::buscarEstadiasCliente(int codigo, const std::string& nome) {
+    std::vector<Estadia> resultados;
+
+    if (codigo > 0) {
+        for (const auto& estadia : estadias) {
+            if (estadia.obterCodigoCliente() == codigo) {
+                resultados.push_back(estadia);
+            }
+        }
+    } 
+    else if (!nome.empty()) {
+        for (const auto& cliente : clientes) {
+            if (cliente.obterNome().find(nome) != std::string::npos) {
+                for (const auto& estadia : estadias) {
+                    if (estadia.obterCodigoCliente() == cliente.obterCodigo()) {
+                        resultados.push_back(estadia);
+                    }
+                }
+            }
+        }
+        std::sort(resultados.begin(), resultados.end(), 
+                  [](const Estadia& a, const Estadia& b) {
+                      return a.obterCodigoEstadia() < b.obterCodigoEstadia();
+                  });
+    }
+
+    return resultados;
+}
