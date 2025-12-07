@@ -104,9 +104,9 @@ O sistema garante a persistência de dados em arquivos binários de acesso diret
 - Escrita: Os dados são salvos nos arquivos .bin sempre que o usuário seleciona a opção Sair (0) no menu principal.
 
 4. Regra de Fidelidade
-Ao realizar a baixa de uma estadia com sucesso, o cliente associado acumula 10 pontos de fidelidade por cada diária paga.
+- Ao realizar a baixa de uma estadia com sucesso, o cliente associado acumula 10 pontos de fidelidade por cada diária paga.
 
 5. Controle de Ocupação e Baixa
-Check-in: Só é permitido se o quarto estiver com status "DESOCUPADO". Após o cadastro da estadia, o status é alterado para "OCUPADO".
+- Check-in: Só é permitido se o quarto estiver com status "DESOCUPADO". Após o cadastro da estadia, o status é alterado para "OCUPADO".
 
-Check-out: Realiza o cálculo do valor total (qtdDiarias * valorDiaria), adiciona pontos de fidelidade e altera o status do quarto para "DESOCUPADO".
+- Check-out: Realiza o cálculo do valor total (qtdDiarias * valorDiaria), adiciona pontos de fidelidade e altera o status do quarto para "DESOCUPADO".
