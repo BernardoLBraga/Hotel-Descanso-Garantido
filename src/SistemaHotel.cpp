@@ -1,4 +1,5 @@
 #include "../include/SistemaHotel.h"
+#include <ctime>
 #include <algorithm>
 #include <iostream>
 #include <cstring>
@@ -154,6 +155,42 @@ int SistemaHotel::calcularDiarias(const char* dataEntrada, const char* dataSaida
     return 5;
 }
 
+int calcularDiarias(const char* dataEntrada, const char* dataSaida) {
+    int diaE, mesE, anoE;
+    int diaS, mesS, anoS;
+
+    if (sscanf(dataEntrada, "%d/%d/%d", &diaE, &mesE, &anoE) != 3) {
+        return -1; 
+    }
+    if (sscanf(dataSaida, "%d/%d/%d", &diaS, &mesS, &anoS) != 3) {
+        return -1; 
+    }
+
+    std::tm tEntrada = {};
+    tEntrada.tm_mday = diaE;
+    tEntrada.tm_mon = mesE - 1; 
+    tEntrada.tm_year = anoE - 1900; 
+    tEntrada.tm_hour = 12;
+
+    std::tm tSaida = {};
+    tSaida.tm_mday = diaS;
+    tSaida.tm_mon = mesS - 1; 
+    tSaida.tm_year = anoS - 1900;
+    tSaida.tm_hour = 12;
+
+    std::time_t timeEntrada = std::mktime(&tEntrada);
+    std::time_t timeSaida = std::mktime(&tSaida);
+    
+    if (timeSaida <= timeEntrada) {
+        return 0;
+    }
+
+    double diferencaSegundos = std::difftime(timeSaida, timeEntrada);
+    int numDiarias = static_cast<int>(diferencaSegundos / 86400.0 + 0.5); 
+    
+    return numDiarias; 
+}
+
 int SistemaHotel::cadastrarEstadia(int codigoCliente, int numeroQuarto, const char* dataEntrada, const char* dataSaida) {
     Cliente* cliente = buscarClientePorCodigo(codigoCliente);
     if (cliente == nullptr) {
@@ -170,6 +207,7 @@ int SistemaHotel::cadastrarEstadia(int codigoCliente, int numeroQuarto, const ch
     }
     
     int qtdDiarias = calcularDiarias(dataEntrada, dataSaida);
+    
     if (qtdDiarias <= 0) {
         return ERRO_DATA_INVALIDA;
     }
